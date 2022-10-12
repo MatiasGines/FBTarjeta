@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FBTarjeta.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,24 +10,48 @@ namespace FBTarjeta.Controllers
     [ApiController]
     public class TarjetaController : ControllerBase
     {
-        // GET: api/<TarjetaController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly AplicationDbContext _context;
+        public TarjetaController(AplicationDbContext context)
         {
-            return new string[] { "value1", "value2" };
+            _context = context;
         }
 
-        // GET api/<TarjetaController>/5
+        // GET: api/<TarjetaController>
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            try
+            {
+                var ListTarjetas = await _context.TarjetaCredito.ToListAsync();
+                return Ok(ListTarjetas);    
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /* GET api/<TarjetaController>/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";
-        }
+        }*/
 
         // POST api/<TarjetaController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] TarjetaCredito tarjeta)
         {
+            try
+            {
+                _context.Add(tarjeta);
+                await _context.SaveChangesAsync();
+                return Ok(tarjeta);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // PUT api/<TarjetaController>/5
