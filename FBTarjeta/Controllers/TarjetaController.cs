@@ -56,14 +56,48 @@ namespace FBTarjeta.Controllers
 
         // PUT api/<TarjetaController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put(int id, TarjetaCredito tarjeta)
         {
+            try
+            {
+                if (id != tarjeta.Id)
+                {
+                    return NotFound();
+                }
+                _context.Update(tarjeta);
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "La tarjeta se actualizo con exito" });
+                  
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
         }
 
         // DELETE api/<TarjetaController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            try
+            {
+                var tarjeta = await _context.TarjetaCredito.FindAsync(id);
+
+                if (tarjeta == null )
+                {
+                    return NotFound();
+                }
+
+                _context.TarjetaCredito.Remove(tarjeta);
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "La tarjeta se elimino con exito" });
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }
